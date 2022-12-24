@@ -1,16 +1,53 @@
 name: Maven verify
-on:
-  pull_request:
-    types: [ opened, reopened, edited ]
+on: [push]
 jobs:
   mvn_verify:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas
+          pip install numpy
+      - run: sudo apt update
+      - run: sudo apt install inotify-tools
+      - run: inotifywait -mr /home/runner/work/Mybatis-PageHelper/Mybatis-PageHelper/ --format '%T;%w;%f;%e' --timefmt %T -o /home/runner/inotify-logs.csv & echo 'basak'
+      - run: touch starting_mvnverify_uses9_9
+      - run: rm starting_mvnverify_uses9_9
       - uses: actions/checkout@v3
+      - run: touch starting_mvnverify_SetupMavenCentralRepository_10
+      - run: rm starting_mvnverify_SetupMavenCentralRepository_10
       - name: Set up Maven Central Repository
         uses: actions/setup-java@v2
         with:
           java-version: '8'
           distribution: 'adopt'
+      - run: touch starting_mvnverify_RuntheMavenverifyphase_15
+      - run: rm starting_mvnverify_RuntheMavenverifyphase_15
       - name: Run the Maven verify phase
         run: mvn --batch-mode --update-snapshots -P dev verify
+      - run: touch starting_finished_finished_8979874
+        if: always()
+      - run: rm starting_finished_finished_8979874
+        if: always()
+      - name: Execute py script # run file
+        if: always()
+        run: |
+          python .github/workflows/script.py
+      - run: cp /home/runner/inotify-logs.csv /home/runner/work/Mybatis-PageHelper/Mybatis-PageHelper/optimizing-ci-builds-ci-analysis/
+        if: always()
+      - name: Pushes analysis to another repository
+        if: always()
+        id: push_directory
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source-directory: 'optimizing-ci-builds-ci-analysis'
+          destination-github-username: 'Priya-it'
+          destination-repository-name: 'ci-analyzes'
+          target-branch: 'Mybatis-PageHelper.1671854815'
+          target-directory: 'Mybatis-PageHelper/1671854815/.github/workflows/pull-request/mvnverify'
